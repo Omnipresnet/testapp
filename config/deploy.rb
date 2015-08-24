@@ -3,10 +3,26 @@ lock '3.4.0'
 
 set application: 'testapp'
 set repo_url: 'git@github.com:Omnipresnet/testapp.git'
-set deploy_to: "/opt/www/#{application}"
+set deploy_to: "/opt/www/testapp"
 set user: 'deploy'
 set linked_dirs: %w{log tmp/pids tmp/cache tmp/sockets}
-set deploy_via: :remote_cache
+
+
+namespace :deploy do
+
+    %w[start stop restart].each do |command|
+    	desc 'Manage Unicorn'
+  		task command do
+  			on roles(:app), in: :sequence, wait: 1 do
+  				execute "etc/init.d/unicorn_#{fetch(:application)} #{command}"
+  			end
+  		end
+  	end
+
+  	after :publishing, :restart
+
+
+#set deploy_via: :remote_cache
 
 # Default branch is :master
 # ask :branch, `git rev-parse --abbrev-ref HEAD`.chomp
@@ -30,7 +46,7 @@ set deploy_via: :remote_cache
 # set :linked_files, fetch(:linked_files, []).push('config/database.yml', 'config/secrets.yml')
 
 # Default value for linked_dirs is []
-# set :linked_dirs, fetch(:linked_dirs, []).push('log', 'tmp/pids', 'tmp/cache', 'tmp/sockets', 'vendor/bundle', 'public/system')
+#set :linked_dirs, fetch(:linked_dirs, []).push('log', 'tmp/pids', 'tmp/cache', 'tmp/sockets', 'vendor/bundle', 'public/system')
 
 # Default value for default_env is {}
 # set :default_env, { path: "/opt/ruby/bin:$PATH" }
@@ -38,23 +54,12 @@ set deploy_via: :remote_cache
 # Default value for keep_releases is 5
 # set :keep_releases, 5
 
-namespace :deploy do
-
-    %w[start stop restart].each do |command|
-    	desc 'Manage Unicorn'
-  		task command do
-  			on roles(:app), in: :sequence, wait: 1 do
-  				execute "etc/init.d/unicorn_#{fetch(:application)} #{command}"
-  			end
-  		end
-  	end
-
-    after  :publication, :restart, :clear_cache do
-    	on roles(:web), in: :groups, limit: 3, wait: 10 do
-      	# Here we can do anything such as:
-      	# within release_path do
-      	#   execute :rake, 'cache:clear'
-      	# end
-   		end
-  	end
+    #after  :publication, :restart, :clear_cache do
+    #	on roles(:web), in: :groups, limit: 3, wait: 10 do
+    #  	# Here we can do anything such as:
+    #  	# within release_path do
+    #  	#   execute :rake, 'cache:clear'
+    #  	# end
+   	#	end
+  	#end
 end
