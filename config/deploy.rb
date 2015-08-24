@@ -1,12 +1,12 @@
 # config valid only for current version of Capistrano
 lock '3.4.0'
 
-set :application, 'testapp'
-set :repo_url, 'git@github.com:Omnipresnet/testapp.git'
-set :deploy_to "/opt/www/#{application}"
-set :user, 'deploy'
+set application: 'testapp'
+set repo_url: 'git@github.com:Omnipresnet/testapp.git'
+set deploy_to: "/opt/www/#{application}"
+set user: 'deploy'
 set linked_dirs: %w{log tmp/pids tmp/cache tmp/sockets}
-set :deploy_via, :remote_cache
+set deploy_via: :remote_cache
 
 # Default branch is :master
 # ask :branch, `git rev-parse --abbrev-ref HEAD`.chomp
